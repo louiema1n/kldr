@@ -5,32 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>数据分析报表系统</title>
     <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+
+    <style>
+        .childrenBody{
+            margin: 10px 10px 0;
+            background-color: #f2f2f2;
+        }
+    </style>
+
 </head>
-<body>
+<body class="childrenBody">
+
+<fieldset class="layui-elem-field">
+    <legend>源数据区域</legend>
+    <div class="layui-field-box">
+        <div class="layui-upload-drag" id="test10">
+            <i class="layui-icon"></i>
+            <p>点击上传，或将文件拖拽到此处</p>
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="layui-elem-field">
+    <legend>条件区域</legend>
+    <div class="layui-field-box">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <div class="layui-inline" style="width: 80%">
+                    <label class="layui-form-label">查询条件1</label>
+                    <div class="layui-input-inline" style="width: 20%;">
+                        <input type="text" name="name1" placeholder="请输入分类名称（如“病理”）" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid">：</div>
+                    <div class="layui-input-inline" style="width: 60%;">
+                        <textarea name="data1" placeholder="请输入该分类包含的所有查询条件。多个条件之间用【英文逗号,】隔开。（如A,B,C）" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" id="footerBtn">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-warm" type="button" id="addSearch">增加查询条件</button>
+                    <button class="layui-btn" lay-submit lay-filter="subBtn">立即提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
 
 
-
-<div class="layui-upload-drag" id="test10">
-    <i class="layui-icon"></i>
-    <p>点击上传，或将文件拖拽到此处</p>
-</div>
 
 <script th:src="@{/layui/layui.js}"></script>
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
 <script>
-    layui.use('upload', function(){
+    layui.use(['upload', 'form'], function(){
         var $ = layui.jquery
-            ,upload = layui.upload;
+            ,upload = layui.upload,
+            form = layui.form;
 
         upload.render({ //允许上传的文件后缀
             elem: '#test10'
             ,url: '/upd'
             ,accept: 'file' //普通文件
-            ,auto: true
+            ,auto: false
             ,exts: 'xls|.xlsx' //只允许上传压缩文件
             ,done: function(res){
                 console.log(res)
             }
+        });
+
+        // 添加查询条件
+        var i = 1;
+        $("#addSearch").click(function () {
+            i++;
+            var html = '            <div class="layui-form-item">\n' +
+                '                <div class="layui-inline" style="width: 80%">\n' +
+                '                    <label class="layui-form-label">查询条件'+i+'</label>\n' +
+                '                    <div class="layui-input-inline" style="width: 20%;">\n' +
+                '                        <input type="text" name="name'+i+'" placeholder="请输入分类名称（如“病理”）" autocomplete="off" class="layui-input">\n' +
+                '                    </div>\n' +
+                '                    <div class="layui-form-mid">：</div>\n' +
+                '                    <div class="layui-input-inline" style="width: 60%;">\n' +
+                '                        <textarea name="data'+i+'" placeholder="请输入该分类包含的所有查询条件。多个条件之间用【英文逗号,】隔开。（如A,B,C）" class="layui-textarea"></textarea>\n' +
+                '                    </div>\n' +
+                '                </div>\n' +
+                '            </div>';
+            $("#footerBtn").before(html);
+        });
+
+        //监听提交
+        form.on('submit(subBtn)', function(data){
+
+            alert(data.field);
+            return false;
         });
 
     });

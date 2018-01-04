@@ -1,3 +1,4 @@
+
 # json地址
 json:
   read: D:/WorkStation/json/
@@ -17,3 +18,5 @@ spring:
 # 加入所有静态资源路径（覆盖默认配置）
   resources:
     static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${json.read}
+server:
+  port: 80
