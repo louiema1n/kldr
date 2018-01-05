@@ -1,5 +1,7 @@
 package com.lm.kldr.controller;
 
+import com.lm.kldr.utils.FileUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -10,8 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class IndexController {
 
+    @Value("${file.temp}")
+    private String tempPath;
+
     @RequestMapping("/upload")
     public String upload() {
+        // 访问时清空本地temp文件夹
+        new FileUtil().delAllFile(tempPath);
         return "upload";
     }
 }

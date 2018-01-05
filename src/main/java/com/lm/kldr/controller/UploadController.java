@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.lm.kldr.domain.PrjClass;
 import com.lm.kldr.domain.ResultSet;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +26,11 @@ import java.util.Map;
 @RestController
 public class UploadController {
 
-    @Value("${json.read}")
-    private String jsonPath;
+    @Value("${file.temp}")
+    private String filePath;
 
     @RequestMapping("/upd")
-    public void upd(@RequestParam("file") MultipartFile file, @RequestParam("search") String search, HttpServletResponse response) {
+    public ResultSet upd(@RequestParam("file") MultipartFile file, @RequestParam("search") String search) {
         try {
             // 读取Excel文件
             HSSFWorkbook wb = new HSSFWorkbook(file.getInputStream());
@@ -79,14 +76,15 @@ public class UploadController {
 //                }
             }
             // 下载文件
-            String fileName = file.getOriginalFilename() + "-分析后.xls";
+            String originalFilename = file.getOriginalFilename();
+            String fileName = originalFilename.substring(0, originalFilename.lastIndexOf(".")) + "-分析后.xls";
 //            response.setContentType("application/octet-stream");
 //            response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
 //            response.flushBuffer();
 //            wbOut.write(response.getOutputStream());
 
             // 下载到指定文件
-            File distFile = new File(jsonPath + fileName);
+            File distFile = new File(filePath + fileName);
             if (!distFile.getParentFile().exists()) {
                 distFile.getParentFile().mkdirs();
             }
@@ -95,25 +93,17 @@ public class UploadController {
             fos.flush();
             fos.close();
 
-            response.setHeader("content-type", "text/html;charset=utf-8");
-
             ResultSet<Object> resultSet = new ResultSet<>();
             resultSet.setCode(0);
             resultSet.setCount(1);
             resultSet.setMsg("<a href='" + fileName +"'><i class=\"layui-icon\" >&#xe622;</i> "+fileName+"</a>");
             resultSet.setData(null);
 
-            try {
-                PrintWriter pw = response.getWriter();
-                String s = JSON.toJSONString(resultSet);
-                pw.write(s);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            return resultSet;
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        return null;
     }
 
     /**
@@ -148,7 +138,7 @@ public class UploadController {
         BufferedReader br = null;
         String str = "";
         try {
-            FileInputStream fis = new FileInputStream(jsonPath + "prjClass.json");
+            FileInputStream fis = new FileInputStream(filePath + "prjClass.json");
             InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
             br = new BufferedReader(isr);
 
@@ -215,9 +205,25 @@ public class UploadController {
     public void copyRow(HSSFRow toRow, HSSFRow fromRow) {
         for (int i = 0; i < fromRow.getLastCellNum(); i++) {
             HSSFCell cell = fromRow.getCell(i);
-            // 设置celltype为string
-            cell.setCellType(CellType.STRING);
-            toRow.createCell(i).setCellValue(cell.getStringCellValue());
+            if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+                // 是否为日期格式
+                if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    // 判断当前单元格日期时间格式
+//                    if (cell.getCellStyle().getDataFormat() == HSSFDataFormat.getBuiltinFormat("yyyy-MM-dd HH:mm:ss")) {
+//
+//                    }
+                    Date date = cell.getDateCellValue();
+                    toRow.createCell(i).setCellValue(sdf.format(date));
+                } else {
+                    // 数值格式 直接获取
+                    toRow.createCell(i).setCellValue(cell.getNumericCellValue());
+                }
+            } else {
+                // 文本格式
+                cell.setCellType(CellType.STRING);
+                toRow.createCell(i).setCellValue(cell.getStringCellValue());
+            }
         }
     }
 }
