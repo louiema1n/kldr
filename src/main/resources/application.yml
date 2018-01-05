@@ -1,7 +1,7 @@
 
 # json地址
 json:
-  read: D:/WorkStation/json/
+  read: D:/WorkStation/temp/
 
 spring:
 # thymeleaf

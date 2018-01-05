@@ -38,21 +38,29 @@
                     </div>
                     <div class="layui-form-mid">：</div>
                     <div class="layui-input-inline" style="width: 60%;">
-                        <textarea name="data1" placeholder="请输入该分类包含的所有查询条件。多个条件之间用【英文逗号,】隔开。（如A,B,C）" class="layui-textarea"></textarea>
+                        <textarea name="data1" placeholder="请输入该分类包含的所有查询条件。多个条件之间用【换行符】隔开。（如A下一行B下一行C）" class="layui-textarea"></textarea>
                     </div>
                 </div>
             </div>
             <div class="layui-form-item" id="footerBtn">
                 <div class="layui-input-block">
                     <button class="layui-btn layui-btn-warm" type="button" id="addSearch">增加查询条件</button>
-                    <button class="layui-btn" lay-submit lay-filter="subBtn">立即提交</button>
+                    <button class="layui-btn" lay-submit lay-filter="subBtn" id="submit">立即提交</button>
                 </div>
             </div>
         </form>
     </div>
 </fieldset>
 
+<fieldset class="layui-elem-field">
+    <legend>结果区域</legend>
+    <div class="layui-field-box">
+        <div class="layui-form" id="file">
 
+        </div>
+        <div class="layui-form-mid layui-word-aux">点击该处文件名下载分析后的文件</div>
+    </div>
+</fieldset>
 
 <script th:src="@{/layui/layui.js}"></script>
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
@@ -67,11 +75,17 @@
             ,url: '/upd'
             ,accept: 'file' //普通文件
             ,auto: false
+            ,data: {'search':''}
+            ,bindAction: '#submit'
             ,exts: 'xls|.xlsx' //只允许上传压缩文件
+            ,before: function (obj) {
+                this.data.search =  getSearch();
+            }
             ,done: function(res){
-                console.log(res)
+                $("#file").html(res.msg);
             }
         });
+
 
         // 添加查询条件
         var i = 1;
@@ -92,10 +106,32 @@
             $("#footerBtn").before(html);
         });
 
+        function getSearch() {
+            // 合成json字符串
+            var str = '[';
+            var name = '';
+            var data = '';
+            for (var j = 1; j <= i; j++) {
+                var dataT = '';
+                var n = 'name' + j, d = 'data' + j;
+                name = '{"name":"' + $("[name=" + n + "]").val() + "\",";
+                var dataArr = $("[name=" + d + "]").val().split('\n');
+                for (var k = 0; k < dataArr.length; k++) {
+                    if (dataArr[k] != '') {
+                        dataT += '\"'+k+'\":"' + dataArr[k] + '\",';
+                    }
+                }
+                data = dataT.substr(0, dataT.lastIndexOf(','));
+                data = '"data":{'+data+'}},';
+                str += name + data;
+            }
+            str = str.substr(0, str.lastIndexOf(','));
+            str += ']';
+            return str;
+        }
+
         //监听提交
         form.on('submit(subBtn)', function(data){
-
-            alert(data.field);
             return false;
         });
 

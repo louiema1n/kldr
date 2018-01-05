@@ -3,6 +3,7 @@ package com.lm.kldr.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.lm.kldr.domain.PrjClass;
+import com.lm.kldr.domain.ResultSet;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -18,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class UploadController {
     private String jsonPath;
 
     @RequestMapping("/upd")
-    public String upd(@RequestParam("file") MultipartFile file, HttpServletResponse response) {
+    public void upd(@RequestParam("file") MultipartFile file, @RequestParam("search") String search, HttpServletResponse response) {
         try {
             // 读取Excel文件
             HSSFWorkbook wb = new HSSFWorkbook(file.getInputStream());
@@ -44,7 +44,7 @@ public class UploadController {
                 // 遍历行
                 HSSFRow row;
 
-                List<PrjClass> prjClasses = jsonFile2List();
+                List<PrjClass> prjClasses = json2List(search);
                 // 创建输出文件
                 createSheet(wbOut, prjClasses, sheet.getRow(2));
 
@@ -79,12 +79,13 @@ public class UploadController {
 //                }
             }
             // 下载文件
-            String fileName = "dist.xls";
-            response.setContentType("application/octet-stream");
-            response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
-            response.flushBuffer();
-            wbOut.write(response.getOutputStream());
+            String fileName = file.getOriginalFilename() + "-分析后.xls";
+//            response.setContentType("application/octet-stream");
+//            response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+//            response.flushBuffer();
+//            wbOut.write(response.getOutputStream());
 
+            // 下载到指定文件
             File distFile = new File(jsonPath + fileName);
             if (!distFile.getParentFile().exists()) {
                 distFile.getParentFile().mkdirs();
@@ -93,10 +94,47 @@ public class UploadController {
             wbOut.write(fos);
             fos.flush();
             fos.close();
+
+            response.setHeader("content-type", "text/html;charset=utf-8");
+
+            ResultSet<Object> resultSet = new ResultSet<>();
+            resultSet.setCode(0);
+            resultSet.setCount(1);
+            resultSet.setMsg("<a href='" + fileName +"'><i class=\"layui-icon\" >&#xe622;</i> "+fileName+"</a>");
+            resultSet.setData(null);
+
+            try {
+                PrintWriter pw = response.getWriter();
+                String s = JSON.toJSONString(resultSet);
+                pw.write(s);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "";
+
+    }
+
+    /**
+     * @description json string转换成List<Object>
+     * @author louiemain
+     * @date Created on 2018-01-05 10:51
+     * @param str
+     * @return java.util.List<com.lm.kldr.domain.PrjClass>
+     */
+    public List<PrjClass> json2List(String str) {
+        str = str.replace("\r\n", "").replaceAll(" +", "");
+
+        PrjClass prjClass;
+
+        List<PrjClass> prjClasses = new ArrayList<>();
+        JSONArray array = JSON.parseArray(str);
+        for (int i = 0; i < array.size(); i++) {
+            prjClass = JSON.parseObject(array.get(i).toString(), PrjClass.class);
+            prjClasses.add(prjClass);
+        }
+        return prjClasses;
     }
 
     /**
