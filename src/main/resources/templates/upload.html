@@ -78,6 +78,7 @@
             ,data: {'search':''}
             ,bindAction: '#submit'
             ,exts: 'xls|.xlsx' //只允许上传压缩文件
+            ,size: 0
             ,before: function (obj) {
                 this.data.search =  getSearch();
             }

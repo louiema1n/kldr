@@ -47,7 +47,7 @@ public class UploadController {
 
                 for (int i = 3; i < sheet.getPhysicalNumberOfRows(); i++) {
                     row = sheet.getRow(i);
-                    String distVal = row.getCell(6).getStringCellValue();
+                    String distVal = row.getCell(0).getStringCellValue();
                     int flag = 0;
                     for (PrjClass p: prjClasses) {
                         String name = p.getName();

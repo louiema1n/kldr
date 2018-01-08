@@ -15,8 +15,14 @@ spring:
 # 表示所有的访问都经过静态资源路径；
   mvc:
     static-path-pattern: /**
+
+  http:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 # 加入所有静态资源路径（覆盖默认配置）
   resources:
     static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${file.temp}
 server:
   port: 80
+
