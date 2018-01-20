@@ -58,7 +58,7 @@ public class Req {
         System.out.println(result);
     }
 
-    public String hcSendPost() {
+    public String hcSendPost(String id) {
 
         String result = "";
 
@@ -68,7 +68,7 @@ public class Req {
         HttpPost post = new HttpPost("http://usertk.100xuexi.com/PaperAjax/AjaxAnser");
         // 创建参数队列
         List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("QuestionID", "9c232004-2bef-4397-b7f6-f37897aa777c"));
+        params.add(new BasicNameValuePair("QuestionID", id));
         params.add(new BasicNameValuePair("allow", "ok"));
 
         UrlEncodedFormEntity uefEntity = null;
@@ -95,27 +95,15 @@ public class Req {
                 e.printStackTrace();
             }
         }
-        System.out.println(result);
         return result;
     }
 
-    public String hcSendGet() {
+    public String hcSendGet(String url) {
         CloseableHttpClient client = HttpClients.createDefault();
         String result = "";
         try {
-            // 创建参数队列
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("TQuestionPlanID", "2569"));
-            params.add(new BasicNameValuePair("groupName", ""));
-            params.add(new BasicNameValuePair("code", ""));
-            params.add(new BasicNameValuePair("tb_l_PaperQuePlanID", "61463"));
-            params.add(new BasicNameValuePair("Model", "chapter"));
-            params.add(new BasicNameValuePair("TypeMenuFlag", "2"));
 
-            UrlEncodedFormEntity uefEntity = null;
-            uefEntity = new UrlEncodedFormEntity(params, "UTF-8");
-            String param = EntityUtils.toString(uefEntity);
-            HttpGet httpGet = new HttpGet("http://usertk.100xuexi.com/PracticeCenter/Chapter/Index" + "?" + param);
+            HttpGet httpGet = new HttpGet("http://usertk.100xuexi.com" + url);
             System.out.println("executing request " + httpGet.getURI());
             CloseableHttpResponse response = client.execute(httpGet);
             HttpEntity entity = response.getEntity();

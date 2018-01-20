@@ -1,0 +1,58 @@
+<!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>数据分析报表系统</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+
+    <style>
+        .childrenBody {
+            margin: 10px 10px 0;
+            background-color: #f2f2f2;
+        }
+    </style>
+
+</head>
+<body class="childrenBody">
+<div id="test"></div>
+<div id="content"></div>
+
+<script th:src="@{/layui/layui.js}"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use('jquery', function () {
+        var $ = layui.jquery;
+
+       $.ajax({
+           url: '/getTest',
+           type: 'get',
+           success: function (data) {
+               var str = '';
+               for (var i=0;i<data.length;i++) {
+                   var href = data[i].href;
+                   href = href.substr(1, href.length - 2);
+                   str += '<a href=/getReq'+href+' target="_blank">'+data[i].name+'</a><br>';
+               }
+               $("#test").html(str);
+           }
+       });
+
+       window.handle = function(href) {
+           $.ajax({
+               url: '/getReq',
+               type: 'post',
+               data: {
+                   "url": href
+               },
+               success: function (data) {
+                   $("#content").html(data);
+               }
+           });
+       }
+
+    });
+</script>
+
+</body>
+</html>
