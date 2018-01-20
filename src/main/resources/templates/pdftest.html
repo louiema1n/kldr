@@ -1,0 +1,42 @@
+<!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>PDF online view</title>
+
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+
+    <style>
+        .childrenBody{
+            margin: 10px 10px 0;
+            background-color: #f2f2f2;
+        }
+    </style>
+
+</head>
+<body>
+<!--<iframe th:src="@{/pdfjs/web/viewer.html}"-->
+    <!--width="100%" height="800"></iframe>-->
+<button type="button" id="previewBtn">预览</button>
+<a href="/pdfViewer?file=/09141fa43f-ad0e-44c3-ad2e-df302fbecb5e.pdf" TARGET="_blank">test.pdf</a>
+
+<script th:src="@{/layui/layui.js}"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['jquery'], function() {
+            var $ = layui.jquery;
+
+        $("#previewBtn").click(function () {
+            var curWwwPath=window.document.location.href;
+            var pathName=window.document.location.pathname;
+            var pos=curWwwPath.indexOf(pathName);
+            var localhostPath=curWwwPath.substring(0,pos);
+            window.open("/pdfViewer?file=/09141fa43f-ad0e-44c3-ad2e-df302fbecb5e.pdf");
+
+        });
+
+        });
+</script>
+</body>
+</html>

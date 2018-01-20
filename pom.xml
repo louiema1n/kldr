@@ -61,6 +61,13 @@
 			<version>1.2.44</version>
 		</dependency>
 
+		<!-- httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.4</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
