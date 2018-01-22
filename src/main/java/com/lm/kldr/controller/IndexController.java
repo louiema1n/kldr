@@ -98,7 +98,7 @@ public class IndexController {
 //        return "123";
     }
 
-    @RequestMapping(value = "/getReq/PracticeCenter/Chapter/{url}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getReq/PracticeCenter/MockExam/{url}", method = RequestMethod.GET)
     @ResponseBody
     public String getReq(@PathVariable String url,
                          @RequestParam("TQuestionPlanID") String TQuestionPlanID,
@@ -109,7 +109,7 @@ public class IndexController {
                          @RequestParam("Model") String Model
     ) {
 
-        String str = new Req().hcSendGet("/PracticeCenter/Chapter/" + url + "?TQuestionPlanID="+TQuestionPlanID
+        String str = new Req().hcSendGet("/PracticeCenter/MockExam/" + url + "?TQuestionPlanID="+TQuestionPlanID
                 +"&groupName="+groupName+"&code="+code+"&tb_l_PaperQuePlanID="+tb_l_PaperQuePlanID+"&Model="+Model+"&TypeMenuFlag="+TypeMenuFlag);
 //
         str = str.replace("/Scripts/jquery-1.8.2.min.js", "https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js");
